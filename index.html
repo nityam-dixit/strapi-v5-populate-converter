@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Strapi V5 Populate Converter</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+    textarea, input, button {
+      margin: 10px 0;
+      width: 80%;
+      max-width: 600px;
+      padding: 10px;
+      font-size: 16px;
+    }
+    textarea {
+      height: 100px;
+    }
+    pre {
+      text-align: left;
+      background: #f4f4f4;
+      padding: 10px;
+      border-radius: 5px;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>Strapi V5 Populate Converter</h1>
+  <p>Convert your old Strapi populate syntax to the new Strapi V5 format.</p>
+
+  <textarea id="input" placeholder="Enter old populate string (e.g., Reason_list,Reason_list.Reason_type)"></textarea>
+  <button onclick="convert()">Convert</button>
+  <pre id="output"></pre>
+
+  <script>
+    function convertToStrapiV5Populate(input) {
+      const parts = input.split(',').reduce((acc, path) => {
+        const keys = path.split('.');
+        let currentLevel = acc;
+
+        keys.forEach((key, index) => {
+          if (!currentLevel[key]) {
+            currentLevel[key] = index === keys.length - 1 ? true : {};
+          }
+          currentLevel = currentLevel[key];
+        });
+
+        return acc;
+      }, {});
+
+      return JSON.stringify(parts, null, 2);
+    }
+
+    function convert() {
+      const input = document.getElementById('input').value;
+      if (!input.trim()) {
+        document.getElementById('output').textContent = 'Please enter a valid input.';
+        return;
+      }
+      const structuredPopulate = convertToStrapiV5Populate(input);
+      document.getElementById('output').textContent = structuredPopulate;
+    }
+  </script>
+</body>
+</html>
